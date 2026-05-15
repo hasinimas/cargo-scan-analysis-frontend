@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Container Analysis System</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 30px;
+}
+
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+h1 {
+    text-align: center;
+    color: #38bdf8;
+}
+
+input, button {
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    background: #38bdf8;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0ea5e9;
+}
+
+.result {
+    white-space: pre-line;
+    background: #0b1220;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.label {
+    color: #94a3b8;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚢 Container Analysis System</h1>
+
+<div class="card">
+    <label class="label">Upload Container Image</label>
+    <input type="file" id="imageInput">
+    <button onclick="analyze()">Analyze Container</button>
+</div>
+
+<div class="card">
+    <h3>Result</h3>
+    <div id="output" class="result">Waiting for input...</div>
+</div>
+
+</div>
+
+<script>
+
+const API_URL = "https://chip-crouch-referable.ngrok-free.dev/analyze-base64";
+
+function toBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+async function analyze() {
+    const fileInput = document.getElementById("imageInput");
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Please select an image!");
+        return;
+    }
+
+    document.getElementById("output").innerText = "Processing...";
+
+    const base64 = await toBase64(file);
+
+    const payload = {
+        base64_image: base64,
+        reg_no: "WEB-001",
+        net_weight: 20000,
+        package_size: "50kg"
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        document.getElementById("output").innerText =
+            `Reg No: ${data.reg_no}
+Container Type: ${data.container_type}
+Estimated Packages: ${data.estimated_package_count}
+
+Observed Fill Ratio: ${data.observed_fill_ratio_percent}%
+Declared Weight: ${data.declared_net_weight_kg} kg
+Estimated Weight: ${data.estimated_weight_kg} kg
+Weight Difference: ${data.weight_difference_kg} kg
+
+Status: ${data.risk_status}`;
+
+    } catch (error) {
+        document.getElementById("output").innerText = "Error calling API!";
+    }
+}
+
+</script>
+
+</body>
+</html>
