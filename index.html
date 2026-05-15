@@ -130,6 +130,7 @@
             // if file selected → override base64
             if (file) {
                 base64 = await fileToBase64(file);
+                base64 = base64.split(",")[1];
             }
 
             if (!base64) {
@@ -169,7 +170,7 @@
         Weight Difference: ${data.weight_difference_kg} kg
 
         Status: ${data.risk_status}
-        
+
         Conclusion: ${data.conclusion}
         `;
 
