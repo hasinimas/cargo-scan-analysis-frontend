@@ -167,7 +167,7 @@
 
                 const data = await res.json();
 
-                document.getElementById("output").innerText =
+                document.getElementById("output").innerHTML =
                     `
         Reg No: ${data.reg_no}
         Container Type: ${data.container_type}
@@ -178,7 +178,7 @@
         Estimated Weight: ${data.estimated_weight_kg} kg
         Weight Difference: ${data.weight_difference_kg} kg
 
-        Status: ${data.risk_status}
+        Status: <span style="color:${data.risk_status === 'Mismatch' ? '#ff4d4d' : '#22c55e'}; font-weight:bold;">${data.risk_status}</span>
 
         Conclusion: ${data.conclusion}
         `;
